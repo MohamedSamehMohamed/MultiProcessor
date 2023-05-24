@@ -14,6 +14,7 @@ namespace MultiProcessor.Data
         private readonly Heap<Process> _readyQueue;
         public int TotalProcessorBusyTime { get; set; }
         public int TotalProcessorIdleTime { get; set; }
+        public int TotalProcessesCpuTime { get; set; }
         public ProcessorSchedulingType ProcessorType { get; set; }
         public Processor(Func<Process, Process, int> cmpFunction)
         {
@@ -21,13 +22,16 @@ namespace MultiProcessor.Data
         }
         public void Add(Process process)
         {
+            TotalProcessesCpuTime += process.CpuTime;
             _readyQueue.Add(process);
         }
         public Process GetNext()
         {
             if (_readyQueue.Size() == 0)
                 throw new InvalidOperationException("Ready queue is empty");
-            return _readyQueue.Remove();
+            var process = _readyQueue.Remove();
+            TotalProcessesCpuTime -= process.CpuTime;
+            return process;
         }
     }
 }
