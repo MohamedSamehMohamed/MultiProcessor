@@ -3,11 +3,18 @@ using MultiProcessor.DataStructures;
 
 namespace MultiProcessor.Data
 {
+    public enum ProcessorSchedulingType
+    {
+        FirstComeFirstService, 
+        ShortestJobFirst,
+        RoundRobin
+    }
     public class Processor
     {
         private readonly Heap<Process> _readyQueue;
         public int TotalProcessorBusyTime { get; set; }
         public int TotalProcessorIdleTime { get; set; }
+        public ProcessorSchedulingType ProcessorType { get; set; }
         public Processor(Func<Process, Process, int> cmpFunction)
         {
             _readyQueue = new Heap<Process>(cmpFunction);

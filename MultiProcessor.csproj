@@ -46,6 +46,7 @@
         <Compile Include="DataStructures\Node.cs" />
         <Compile Include="Data\Process.cs" />
         <Compile Include="Data\Processor.cs" />
+        <Compile Include="Data\ProcessorFactory.cs" />
         <Compile Include="Data\Scheduler.cs" />
         <Compile Include="Program.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
