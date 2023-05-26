@@ -33,5 +33,35 @@ namespace MultiProcessor.Data
             TotalProcessesCpuTime -= process.CpuTime;
             return process;
         }
+        public Process? GetProcess(int processId)
+        {
+            var allProcesses = _readyQueue.GetList();
+            foreach (var process in allProcesses)
+            {
+                if (process.Id == processId)
+                {
+                    return process;
+                }
+            }
+            return null;
+        }
+
+        public void TerminateProcess(int processId)
+        {
+            var allProcesses = _readyQueue.GetList();
+            var index = 0;
+            var found = false;
+            foreach (var process in allProcesses)
+            {
+                if (process.Id == processId)
+                {
+                    found = true;
+                    break;
+                }
+                index++;
+            }
+            if (!found) return;
+            _readyQueue.RemoveByIndex(index + 1);
+        }
     }
 }

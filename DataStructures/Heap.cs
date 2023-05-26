@@ -25,27 +25,6 @@ namespace MultiProcessor.DataStructures
                 _heapArray[i] = copyArray[i];
             }
         }
-        public void Add(T data)
-        {
-            _checkSize();
-            _heapArray[_size++] = data;
-            _heapifyUp(_size-1);
-        }
-
-        public T Peek()
-        {
-            return _heapArray[1];
-        }
-
-        public T Remove()
-        {
-            var valToReturn = _heapArray[1];
-            _heapArray[1] = _heapArray[_size - 1];
-            _size--;
-            heapifyDown(1);
-            return valToReturn;
-        }
-
         private void heapifyDown(int index)
         {
             var children = new int[]{ index * 2, index * 2 + 1 };
@@ -74,7 +53,6 @@ namespace MultiProcessor.DataStructures
             (_heapArray[selectedChild], _heapArray[index]) = (_heapArray[index], _heapArray[selectedChild]);
             heapifyDown(selectedChild);
         }
-
         private void _heapifyUp(int index)
         {
             while (true)
@@ -89,10 +67,68 @@ namespace MultiProcessor.DataStructures
                 index = parent;
             }
         }
+        private void _heapifyUpWithNoCondition(int index)
+        {
+            while (true)
+            {
+                var parent = index / 2;
+                if (parent < 1) return;
+                var cmpValue = _compareFunction.Invoke(_heapArray[index], _heapArray[parent]);
+                (_heapArray[index], _heapArray[parent]) = (_heapArray[parent], _heapArray[index]);
+                index = parent;
+            }
+        }
+        public void Add(T data)
+        {
+            _checkSize();
+            _heapArray[_size++] = data;
+            _heapifyUp(_size-1);
+        }
+        public T Peek()
+        {
+            return _heapArray[1];
+        }
+        public T Remove()
+        {
+            var valToReturn = _heapArray[1];
+            _heapArray[1] = _heapArray[_size - 1];
+            _size--;
+            heapifyDown(1);
+            return valToReturn;
+        }
 
+        public T[] GetList()
+        {
+            var listSize = Size();
+            var toReturn = new T[listSize];
+            for (var i = 0; i < listSize; i++)
+            {
+                toReturn[i] = _heapArray[i + 1];
+            }
+
+            return toReturn;
+        }
         public int Size()
         {
             return _size-1;
+        }
+
+        public void RemoveByIndex(int index)
+        {
+            // if it is the root 
+            if (index == 1)
+            {
+                Remove();
+                return;
+            }
+            // if it is a leaf 
+            if (index == _size - 1)
+            {
+                _size--;
+                return;
+            }
+            _heapifyUpWithNoCondition(index);
+            Remove();
         }
     }
 }

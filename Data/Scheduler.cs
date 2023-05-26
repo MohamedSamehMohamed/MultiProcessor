@@ -18,7 +18,6 @@ namespace MultiProcessor.Data
         // every StealingTime Scheduler Performs stealing operation 
         public int StealingTime { get; set; } = 10;
         public double StealLimit { get; set; } = 0.4;
-        
         public Scheduler()
         {
             _processors = new List<Processor>();
@@ -37,7 +36,6 @@ namespace MultiProcessor.Data
             var processor = _processors.OrderBy(processor => processor.TotalProcessesCpuTime).First();
             processor.Add(process);
         }
-
         public void PerformStealing()
         {
             while(true)
@@ -52,6 +50,19 @@ namespace MultiProcessor.Data
                     break;
                 var process = longestProcessorQueue.GetNext();
                 shortProcessorQueue.Add(process);
+            }
+        }
+        public void KillProcess(int processId)
+        {
+            foreach(var processor in _processors.
+                        Where(processor=>processor.ProcessorType == ProcessorSchedulingType.FirstComeFirstService))
+            {
+                var process = processor.GetProcess(processId);
+                if (process == null) continue;
+                if (process.State != ProcessState.Rdy && process.State != ProcessState.Run)
+                    break;
+                // this is the process to be [removed / killed] 
+                processor.TerminateProcess(processId);
             }
         }
     }
