@@ -30,7 +30,6 @@ namespace MultiProcessor.Data
             if (_readyQueue.Size() == 0)
                 throw new InvalidOperationException("Ready queue is empty");
             var process = _readyQueue.Remove();
-            TotalProcessesCpuTime -= process.CpuTime;
             return process;
         }
         public Process? GetProcess(int processId)
@@ -56,12 +55,39 @@ namespace MultiProcessor.Data
                 if (process.Id == processId)
                 {
                     found = true;
+                    TotalProcessesCpuTime -= process.CpuTime;
                     break;
                 }
                 index++;
             }
             if (!found) return;
+            Console.WriteLine("terminate a process in processor of type : {0}", ProcessorType);
+            Console.WriteLine("process Id {0}", processId);
             _readyQueue.RemoveByIndex(index + 1);
+        }
+
+        public bool IsIdeal()
+        {
+            return _readyQueue.Size() == 0;
+        }
+
+        public void RunProcess(int time)
+        {
+            var process = GetNext();
+            TotalProcessesCpuTime -= time;
+            process.CpuTime -= time;
+            Console.WriteLine("running a process in processor of type : {0}", ProcessorType);
+            Console.WriteLine("process Id {0}, process cp time {1}", process.Id, process.CpuTime);
+            TotalProcessorBusyTime += time;
+            Add(process);
+        }
+
+        public Process GetNextWithOutRemove()
+        {
+            if (_readyQueue.Size() == 0)
+                throw new InvalidOperationException("Ready queue is empty");
+            var process = _readyQueue.Peek();
+            return process;
         }
     }
 }

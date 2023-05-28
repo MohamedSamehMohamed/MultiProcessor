@@ -7,8 +7,7 @@ namespace MultiProcessor.Data
     public class Scheduler
     {
         private List<Processor> _processors;
-        private List<Process> _processes;
-        public int CurrentTime { get; } = 0;
+        public int CurrentTime { get; set; } = 0;
         // to migrate from RoundRobin To ShortJobFirst 
         public int RrMigrationThreshold { get; set; } = 5;
         // to migrate from FirstComeFirstService to RoundRobin 
@@ -21,10 +20,10 @@ namespace MultiProcessor.Data
         public Scheduler()
         {
             _processors = new List<Processor>();
-            _processes = new List<Process>();
         }
         public void AddProcessor(ProcessorSchedulingType processorSchedulingType)
         {
+            Console.WriteLine("add a new processor of type {0}", processorSchedulingType);
             _processors.Add(ProcessorFactory.GetProcessor(processorSchedulingType));
         }
         public void AddProcess(Process process)
@@ -34,6 +33,7 @@ namespace MultiProcessor.Data
                 throw new InvalidOperationException("No processor available");
             }
             var processor = _processors.OrderBy(processor => processor.TotalProcessesCpuTime).First();
+            Console.WriteLine("add a new process to a processor of type {0}, processor CT {2}, \nprocess Id {1}: process Arrival time {3}, process cp time{4}", processor.ProcessorType, process.Id, processor.TotalProcessesCpuTime, process.ArrivalTime, process.CpuTime);
             processor.Add(process);
         }
         public void PerformStealing()
@@ -63,6 +63,31 @@ namespace MultiProcessor.Data
                     break;
                 // this is the process to be [removed / killed] 
                 processor.TerminateProcess(processId);
+            }
+        }
+
+        public void Start()
+        {
+            while (CurrentTime < 20)
+            {
+                Console.WriteLine("current Time {0}", CurrentTime);
+                foreach (var processor in _processors)
+                {
+                    if (processor.IsIdeal()) 
+                        continue;
+                    var process = processor.GetNextWithOutRemove();
+                    if (process.ArrivalTime > CurrentTime) 
+                        continue;
+                    if (process.CpuTime == 0)
+                    {
+                        process.State = ProcessState.Trm;
+                        processor.TerminateProcess(process.Id);
+                        continue;
+                    }
+                    
+                    processor.RunProcess(1);
+                }
+                CurrentTime++;
             }
         }
     }

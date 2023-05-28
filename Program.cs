@@ -1,26 +1,64 @@
 ﻿using System;
+using System.Collections.Generic;
 using MultiProcessor.Data;
-using MultiProcessor.DataStructures;
-
 namespace MultiProcessor
 {
     internal class Program
-    {
+    { 
+        public void Test()
+        {
+            var processes = new List<Process> 
+            {
+                new Process
+                {
+                    Id = 1, 
+                    State = ProcessState.New,
+                    ArrivalTime = 1,
+                    CpuTime = 3
+                },
+                new Process
+                {
+                    Id = 2, 
+                    State = ProcessState.New,
+                    ArrivalTime = 1,
+                    CpuTime = 3
+                },
+                new Process
+                {
+                    Id = 3, 
+                    State = ProcessState.New,
+                    ArrivalTime = 1,
+                    CpuTime = 3
+                },
+                new Process
+                {
+                    Id = 4, 
+                    State = ProcessState.New,
+                    ArrivalTime = 1,
+                    CpuTime = 8
+                },
+                new Process
+                {
+                    Id = 5, 
+                    State = ProcessState.New,
+                    ArrivalTime = 1,
+                    CpuTime = 7
+                },
+                
+            };
+            var multiProcessor = new Scheduler();
+            multiProcessor.AddProcessor(ProcessorSchedulingType.ShortestJobFirst);
+            multiProcessor.AddProcessor(ProcessorSchedulingType.FirstComeFirstService);
+            multiProcessor.AddProcessor(ProcessorSchedulingType.RoundRobin);
+            foreach (var process in processes)
+            {
+                multiProcessor.AddProcess(process);
+            }
+            multiProcessor.Start();
+        }
+        
         public static void Main(string[] args)
         {
-            var FcfsProcessor = new Processor((p1, p2) => p1.ArrivalTime - p2.ArrivalTime);
-            for (int i = 10; i >= 0; i--)
-            {
-                var p = new Process();
-                p.ArrivalTime = i;
-                FcfsProcessor.Add(p);
-            }
-
-            for (int i = 0; i < 10; i++)
-            {
-                var p = FcfsProcessor.GetNext();
-                Console.WriteLine(p.ArrivalTime);
-            }
         }
     }
 }
